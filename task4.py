@@ -5,4 +5,10 @@ from web3 import Web3
 # w3 = Web3()
 # contract = w3.eth.contract(bytecode=bytecode)
 cursor = sqlite3.connect(input()).cursor()
-users = cursor.execute("""select """)
+users = cursor.execute('select * from users').fetchall()
+balances = {}
+for index, account in users:
+    tranfers_to = cursor.execute('select _amount from transfers where _to=?', (index,)).fetchall()
+    accruals = cursor.execute('select _amount from accruals where _to=?', (index,)).fetchall()
+    transfers_from = cursor.execute('select _amount from transfers where _from=?', (index,)).fetchall()
+    balances[account] = sum(sum(transfers_to, tuple())) + sum(sum(accruals, tuple())) - sum(sum(transfers_from, tuple()))
